@@ -1,11 +1,13 @@
 #version 460
-  in vec3 vaPostion;
+  in vec3 vaPosition;
   in vec2 vaUV0;
 
-uniform vec3 chunkoffset;
+uniform vec3 chunkOffset;
 // used to render terrain
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
+uniform vec3 cameraPosition;
+uniform mat4 gbufferModelViewinverse;
 // time to add textures , as everything 's white rn
 
 out vec2 texCoord;
@@ -18,6 +20,10 @@ void main(){
  texCoord = vaUV0;
 
 
-    gl_Position = projectionMatrix *modelViewMatrix * vec4(vaPostion+chunkoffset,1);
-    // please load????
+             vec3 worldspacePosition = cameraPosition + (gbufferModelViewinverse * modelViewMatrix * vec4(vaPosition + chunkOffset,1)).xyz;
+           
+         float distanceFromCamera = length(worldspacePosition - cameraPosition);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(vaPosition + chunkOffset - .1 * distanceFromCamera,1);
+ 
+     // please load????
 }
