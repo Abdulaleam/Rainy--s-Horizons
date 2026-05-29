@@ -19,11 +19,7 @@ void main(){
     // so this () is supposed to be for input as i know , BUT HERE IT DONT ACTUALLY EXPECT input? confusing wth
  texCoord = vaUV0;
 
-
-             vec3 worldspacePosition = cameraPosition + (gbufferModelViewinverse * modelViewMatrix * vec4(vaPosition + chunkOffset,1)).xyz;
-           
-         float distanceFromCamera = length(worldspacePosition - cameraPosition);
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(vaPosition + chunkOffset - .1 * distanceFromCamera,1);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(vaPosition+chunkOffset,1);
  
      // please load????
 }
