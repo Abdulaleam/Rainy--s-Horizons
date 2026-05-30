@@ -13,18 +13,18 @@ in vec2 lightMapCoords;
 
 void main() {
 
-       vec3 lightColor = texture(lightmap,lightMapCoords).rgb;
+       vec3 lightColor = pow(texture(lightmap,lightMapCoords).rgb, vec3(2.2));
        // I Had to spent 30 mins to figure out an error turns out i typed m not M and for the M i did m
 
     // btw i wasted 20 mins , forgetting to turn this into a vac 3 and adding .rgb
-    vec4 outputColorData = texture(gtexture, texCoord);
+    vec4 outputColorData = pow(texture(gtexture, texCoord), vec4(2.2));
 
-    vec3 outputColor = outputColorData.rgb * foliageColor * lightColor;
+    vec3 outputColor = outputColorData.rgb * pow(foliageColor, vec3(2.2)) * lightColor;
     float transparency = outputColorData.a;
 
     if (transparency < 0.1) {
         discard;
     }
 
-    outColor0 = vec4(outputColor, transparency);
+    outColor0 = pow(vec4(outputColor, transparency),vec4(1.0/2.2));
 }
