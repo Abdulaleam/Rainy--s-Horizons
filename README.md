@@ -21,3 +21,8 @@ Resource Pack : https://modrinth.com/resourcepack/weed-eater/version/1.20_LABpbr
  Important  resource pack  : 's the RAINY PACK ZIP , ITS needed
  
 ( all of them are needed , they are NEEDED)
+Images : 
+
+<img width="1920" height="1080" alt="2026-05-31_06 23 15" src="https://github.com/user-attachments/assets/ba9470e7-7424-4171-a034-88632563b997" />
+
+<img width="1920" height="1080" alt="2026-05-31_06 23 29" src="https://github.com/user-attachments/assets/f1f719ce-76f2-44a2-8f41-9d5ef896d0fc" />
