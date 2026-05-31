@@ -36,6 +36,7 @@ vec3 lightingCalculations(vec3 albedo,vec3 tangent, vec3 normalWorldSpace, vec3 
 
     //directions
     vec3 shadowLightDirection =  normalize(mat3(gbufferModelViewInverse) * shadowLightPosition);
+    
     vec3 reflectionDirection = reflect(-shadowLightDirection,normalWorldSpace);
     vec3 viewDirection = normalize(cameraPosition - fragWorldSpace);
 
