@@ -10,20 +10,23 @@ uniform mat4 dhprojection;
 out vec4 blockColor;
 out vec2 lightMapCoords;
 out vec3 viewSpacePosition;
+out vec3 geoNormal;
+
 // btw texcoord stands for texture coordinate if any1 reading my project  wanna learn shaders i guess
 
 
 void main(){
+        geoNormal = gl_NormalMatrix * gl_Normal;
+        
+        blockColor = gl_Color;
 
-    // so this () is supposed to be for input as i know , BUT HERE IT DONT ACTUALLY EXPECT input? confusing wth
-     blockColor = gl_Color;
-     lightMapCoords = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
+        lightMapCoords = (gl_TextureMatrix[0] * gl_MultiTexCoord1).xy;
 
-    
+        viewSpacePosition = (gl_ModelViewMatrix * gl_Vertex).xyz;
 
-          gl_Position = ftransform();
+        gl_Position = ftransform();
+        
 
- 
-     // please load????
-     
+   
+
 }

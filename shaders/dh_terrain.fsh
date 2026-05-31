@@ -1,49 +1,75 @@
 #version 460 compatibility
 
-/* DRAWBUFFERS:0 */
-
 
 uniform sampler2D lightmap;
-uniform float viewWidth;
-uniform float viewHeight;
 uniform sampler2D depthtex0;
+uniform sampler2D dhDepthTex0;
+uniform float viewHeight;
+uniform float viewWidth;
+uniform float far;
+uniform float near;
+uniform float dhNearPlane;
+uniform float dhFarPlane;
 uniform vec3 fogColor;
+uniform mat4 gbufferModelViewinverse;
 
-layout(location = 0) out vec4 outColor0;
+uniform vec3 shadowLightPosition;
 
 in vec4 blockColor;
+in vec2 texCoord;
+in vec3 foliageColor;
 in vec2 lightMapCoords;
 in vec3 viewSpacePosition;
+in vec3 geoNormal;
+
+
+/* DRAWBUFFERS:0 */
+
+ layout(location = 0) out vec4 outColor0;
+
+
+
+float linearizeDepth(float depth, float near, float far) {
+     return ( near * far ) / ( depth * ( near - far) + far );
+}
 
 void main() {
 
-       vec3 lightColor = pow(texture(lightmap,lightMapCoords).rgb, vec3(2.2));
-       // I Had to spent 30 mins to figure out an error turns out i typed m not M and for the M i did m
 
-    // btw i wasted 20 mins , forgetting to turn this into a vac 3 and adding .rgb
-    vec4 outputColorData = blockColor;
-    
-    vec3 outputColor = outputColorData.rgb * lightColor;
-    float transparency = outputColorData.a;
+ vec4 outputColorData = blockColor;
+   vec3 outputColor = pow(outputColorData.rgb, vec3(2.2));
+  float transparency = outputColorData.a;
+        if (transparency < 0.1) {
 
-    if (transparency < 0.1) {
-        discard;
-    }
-   vec2 texCoord = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
-   float depth = texture(depthtex0, texCoord).r;
+         discard;
+        }
 
-   if(depth != 1.0) {
-    discard;
-   }
-   float distanceFromCamera = distance(vec3(0),viewSpacePosition);
-   
-   float maxfogDistance = 4000;
-   float minFogDistance = 2500;
+   vec3 shadowLightDirection = normalize(shadowLightPosition);
+
+   vec3 worldGeoNormal = mat3(gbufferModelViewinverse) * geoNormal;
+
+   float lightBrightness = clamp(dot(shadowLightDirection, worldGeoNormal), 0.1, 1.0);
+
+   vec3 lightColor =pow(texture(lightmap,lightMapCoords).rgb,vec3(2.2));
+     
+      outputColor *= lightColor;
 
 
-   float fogBlendValue = clamp((distanceFromCamera - minFogDistance) / (maxfogDistance - minFogDistance),0,1);
 
-   outputColor = mix(outputColor, fogColor,fogBlendValue);
+    vec2 texCoord = gl_FragCoord.xy / vec2(viewWidth, viewHeight);
+    float depth = texture(depthtex0, texCoord).r;
+    float dhDepth = gl_FragCoord.z;
+      float depthLinear = linearizeDepth(depth, near, far*4);
+      float dhDepthLinear = linearizeDepth(dhDepth, dhNearPlane, dhFarPlane);
 
-    outColor0 = pow(vec4(outputColor, transparency),vec4(1/2.2));
+      if (depthLinear > dhDepthLinear && depth != 1.0) {
+          discard;
+      }
+
+      float distanceFromCamera = distance(viewSpacePosition, vec3(0.0));
+            float dhBlend = pow(smoothstep(dhFarPlane-.5 *dhFarPlane, dhFarPlane, dhDepthLinear), 0.6);
+            transparency = mix(transparency, 0.0, dhBlend);
+            float fogBlendValue = smoothstep(.9,1.0,dhDepth);
+            outColor0 = vec4(mix(outputColor, fogColor, fogBlendValue), transparency);
 }
+
